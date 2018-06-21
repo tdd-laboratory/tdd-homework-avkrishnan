@@ -22,13 +22,42 @@ class TestCase(unittest.TestCase):
     def test_mixed_ordinals(self):
         self.assert_extract(NUM_CORPUS, library.mixed_ordinals, '5th', '1st')
 
-    # Second unit test; prove that if we look for integers, we find four of them.
+    #Second unit test; prove that if we look for integers, we find four of them.
     def test_integers(self):
         self.assert_extract(NUM_CORPUS, library.integers, '1845', '15', '20', '80')
 
-    # Third unit test; prove that if we look for integers where there are none, we get no results.
+    # Third unit test; prove that if we look for a date, we find it.
+    def test_dates(self):
+        self.assert_extract('I was born on 1965-12-25.', library.dates_iso8601, '1965-12-25')
+
+    # Fourth unit test; prove that months more than 12 and days more than 31 are flagged 
+    def test_wrong_dates(self):
+        self.assert_extract('I was born on 1965-13-32.', library.dates_iso8601)
+
+    # Fifth unit test; prove that if we look for integers where there are none, we get no results.
     def test_no_integers(self):
         self.assert_extract("no integers", library.integers)
+
+    # Sixth unit test; prove that dates such as dd mmm yyyy are handled
+    def test_dates_fmt2(self):
+        self.assert_extract('I was born on 25 Jan 2017.', library.dates_fmt2, '25 Jan 2017')
+
+    # Seventh unit test; prove that dates such as dd mmm, yyyy are handled
+    def test_dates_fmt2_with_comma(self):
+        self.assert_extract('I was born on 25 Jan, 2017.', library.dates_fmt2, '25 Jan 2017')
+
+    # Eighth unit test; prove that dates with timestamps are flagged 
+    def test_dates_with_timestamp(self):
+        self.assert_extract('I was born on 1965-11-22 05:43:54.2.', library.dates_iso8601)
+
+    # Ninth unit test; prove that dates with timestamps with timezone at end are flagged 
+    def test_dates_with_timestamp_with_tz(self):
+        self.assert_extract('I was born on 1965-11-22 T05:43:54.2MDT.', library.dates_iso8601)
+
+    # Tenth unit test; prove that dates with timestamps with T delimeter are flagged 
+    def test_dates_with_timestamp_with_T(self):
+        self.assert_extract('I was born on 1965-11-22 T05:43:54.2.', library.dates_iso8601)
+
 
 
 if __name__ == '__main__':
